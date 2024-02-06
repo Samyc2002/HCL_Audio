@@ -6,7 +6,8 @@ NAMES = {
 }
 N_CLASSES = {'esc50': 10}
 BACKBONES = {
-    'esc50': ["resnet18", "resnet18", "resnet18", "resnet18", "resnet18", "resnet18", "resnet18", "resnet18", "resnet18", "resnet18"]
+    # + ["resnet34"] * 2 + ["vgg16.tv_in1k"] * 2 + ["mixer_b16_224.miil_in21k_ft_in1k"] * 2
+    'esc50': ["resnet18"] * 10
 }
 
 

@@ -22,7 +22,7 @@ class ContinualModel(nn.Module):
         self.dataset = dataset
 
         self.opt = get_optimizer(
-            "sgd", self.net, lr=0.03, momentum=0.9, weight_decay=0.0005, cl_default=True)
+            "sgd", self.net, lr=0.0002, momentum=0.9, weight_decay=0.0005, cl_default=True)
 
         self.device = torch.device(
             "cuda:0" if torch.cuda.is_available() else "cpu")

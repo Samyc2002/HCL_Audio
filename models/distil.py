@@ -1,9 +1,9 @@
 # Distil Model
-import torch
-
-from utils.losses import KL_div_Loss
-from utils.buffer import Buffer
 from .utils.continual_model import ContinualModel
+from utils.buffer import Buffer
+from utils.losses import KL_div_Loss
+import torch
+import os
 
 
 class Distil(ContinualModel):
@@ -20,6 +20,7 @@ class Distil(ContinualModel):
         self.soft = torch.nn.Softmax(dim=1)
 
     def observe(self, inputs1, labels, inputs2, notaug_inputs, task_id):
+        os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
         self.opt.zero_grad()
         inputs1, labels = inputs1.to(self.device), labels.to(self.device)
         inputs2 = inputs2.to(self.device)
@@ -40,12 +41,12 @@ class Distil(ContinualModel):
             loss = self.loss(outputs, labels)
 
         if task_id:
-            data_dict = {'loss': loss, 'penalty': penalty}
+            data_dict = {'loss': loss.item(), 'penalty': penalty.item()}
         else:
-            data_dict = {'loss': loss, 'penalty': 0.}
+            data_dict = {'loss': loss.item(), 'penalty': 0.}
 
         loss.backward()
         self.opt.step()
-        data_dict.update({'lr': 0.03})
+        data_dict.update({'lr': 0.0002})
 
         return data_dict

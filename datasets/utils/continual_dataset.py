@@ -4,6 +4,8 @@ from torch.utils.data import DataLoader
 from torch import nn as nn
 import numpy as np
 
+BATCH_SIZE = 2
+
 
 class ContinualDataset:
     """
@@ -112,11 +114,11 @@ def store_masked_loaders(train_dataset, test_dataset, memory_dataset, setting):
     memory_dataset.targets = np.array(memory_dataset.targets)[train_mask]
 
     train_loader = DataLoader(
-        train_dataset, batch_size=32, shuffle=True, num_workers=4, pin_memory=True)
-    test_loader = DataLoader(test_dataset, batch_size=32,
+        train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, pin_memory=True)
+    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE,
                              shuffle=False, num_workers=4, pin_memory=True)
     memory_loader = DataLoader(
-        memory_dataset, batch_size=32, shuffle=False, num_workers=4)
+        memory_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
     setting.test_loaders.append(test_loader)
     setting.train_loaders.append(train_loader)
@@ -150,11 +152,11 @@ def store_masked_label_loaders(train_dataset, test_dataset, memory_dataset, sett
     memory_dataset.targets = np.array(memory_dataset.targets)[train_mask]
 
     train_loader = DataLoader(
-        train_dataset, batch_size=32, shuffle=True, num_workers=4)
-    test_loader = DataLoader(test_dataset, batch_size=32,
+        train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE,
                              shuffle=False, num_workers=4)
     memory_loader = DataLoader(
-        memory_dataset, batch_size=32, shuffle=False, num_workers=4)
+        memory_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
     setting.test_loaders.append(test_loader)
     setting.train_loaders.append(train_loader)
@@ -174,11 +176,11 @@ def store_domain_loaders(train_dataset, test_dataset, memory_dataset, setting):
     :return: train and test loaders
     """
     train_loader = DataLoader(train_dataset,
-                              batch_size=32, shuffle=True, num_workers=4, pin_memory=True)
+                              batch_size=BATCH_SIZE, shuffle=True, num_workers=4, pin_memory=True)
     test_loader = DataLoader(test_dataset,
-                             batch_size=32, shuffle=False, num_workers=4, pin_memory=True)
+                             batch_size=BATCH_SIZE, shuffle=False, num_workers=4, pin_memory=True)
     memory_loader = DataLoader(memory_dataset,
-                               batch_size=32, shuffle=False, num_workers=4)
+                               batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
     setting.test_loaders.append(test_loader)
     setting.train_loaders.append(train_loader)

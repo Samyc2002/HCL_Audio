@@ -50,6 +50,8 @@ def evaluate(model, dataset, device, classifier=None, last=False):
 
 
 def main():
+    num_epochs = 2
+
     dataset = get_dataset()
     dataset_copy = get_dataset()
 
@@ -68,7 +70,7 @@ def main():
     for t in range(dataset.N_TASKS):
         train_loader, memory_loader, test_loader = dataset.get_data_loaders()
 
-        global_progress = tqdm(range(0, 200), desc=f'Training')
+        global_progress = tqdm(range(0, num_epochs), desc=f'Training')
 
         prev_mean_acc = 0.
         best_epoch = 0.
@@ -91,7 +93,7 @@ def main():
             model.train()
 
             local_progress = tqdm(
-                train_loader, desc=f'Epoch {epoch}/{200}', disable=True)
+                train_loader, desc=f'Epoch {epoch}/{num_epochs}', disable=True)
             for idx, data in enumerate(local_progress):
                 (images1, images2, notaug_images), labels = data
                 data_dict = model.observe(

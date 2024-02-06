@@ -1,5 +1,7 @@
 # My ESC50 dataset
+from utils import create_if_not_exists
 import numpy as np
+import h5py
 import torchvision.transforms as transforms
 from PIL import Image
 from pathlib import Path
@@ -39,33 +41,55 @@ class MYESC50():
         return len(self.targets)
 
 
-def my_esc50(train=False, transform=None):
+def my_esc50(transform=None):
     """
     Preprocesses the ESC50 dataset.
     """
-    file_path = "E:\\Projects\\ContinuousLearning\\HCL_Audio\\assets\esc50\\"
+    directory = 'data/esc50/'
+    create_if_not_exists(directory)
 
-    files = os.listdir(file_path)
-    data, targets = [], []
+    if os.path.exists(directory + "image_data.h5") and os.path.exists(directory + "target_data.h5"):
+        # Return from file itself
+        h5image = h5py.File(directory + "image_data.h5", "r")
+        image_data = h5image['esc50'][:]
+        h5image.close()
+        h5target = h5py.File(directory + "target_data.h5", "r")
+        target_data = h5target['esc50'][:]
+        h5target.close()
 
-    for filename in files:
-        y, sr = librosa.load(file_path + filename, sr=None)
+        return MYESC50(image_data, target_data, transform)
+    else:
+        file_path = "E:\\Projects\\ContinuousLearning\\HCL_Audio\\assets\esc50\\"
 
-        S_dB = librosa.feature.melspectrogram(
-            y=y, sr=sr, n_mels=128, fmax=8000)
-        S_dB = librosa.power_to_db(S_dB)
-        # librosa.display.specshow(S_dB, sr=sr, x_axis='time', y_axis='mel')
+        files = os.listdir(file_path)
+        data, targets = [], []
 
-        # Convert to PIL image
-        S_dB -= S_dB.min()
-        S_dB *= (255.0 / S_dB.max())
-        S_img = Image.fromarray(S_dB.astype(np.uint8)).convert(
-            'RGB').resize((255, 255))
+        for filename in files:
+            y, sr = librosa.load(file_path + filename, sr=None)
 
-        data.append(S_img)
-        targets.append(int(Path(filename).stem.split("-")[-1]))
+            S_dB = librosa.feature.melspectrogram(
+                y=y, sr=sr, n_mels=128, fmax=8000)
+            S_dB = librosa.power_to_db(S_dB)
+            # librosa.display.specshow(S_dB, sr=sr, x_axis='time', y_axis='mel')
 
-    return MYESC50(data, targets, transform)
+            # Convert to PIL image
+            S_dB -= S_dB.min()
+            S_dB *= (255.0 / S_dB.max())
+            S_img = Image.fromarray(S_dB.astype(np.uint8)).convert(
+                'RGB').resize((255, 255))
+
+            data.append(S_img)
+            targets.append(int(Path(filename).stem.split("-")[-1]))
+
+        # Cache to file
+        h5image = h5py.File(directory + "image_data.h5", "w")
+        image_data = h5image.create_dataset("esc50", data=data)
+        h5image.close()
+        h5target = h5py.File(directory + "target_data.h5", "w")
+        target_data = h5target.create_dataset("esc50", data=targets)
+        h5target.close()
+
+        return MYESC50(data, targets, transform)
 
 
 class ESC50(ContinualDataset):
@@ -88,8 +112,8 @@ class ESC50(ContinualDataset):
         test_transform = get_aug(train=False, train_classifier=False,
                                  mean_std=esc_norm, name="simsiam", image_size=32, cl_default=True)
 
-        train_dataset = my_esc50(train=True, transform=transform)
-        memory_dataset = my_esc50(train=True, transform=test_transform)
+        train_dataset = my_esc50(transform=transform)
+        memory_dataset = my_esc50(transform=test_transform)
 
         train_dataset, test_dataset = get_train_val(
             train_dataset, test_transform, self.NAME)
