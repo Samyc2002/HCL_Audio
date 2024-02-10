@@ -1,4 +1,4 @@
-# My ESC50 dataset
+# My ESC10 dataset
 from utils import create_if_not_exists
 import numpy as np
 import h5py
@@ -13,7 +13,7 @@ import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
-class MYESC50():
+class MYESC10():
     def __init__(self, data, targets, transform):
         self.data = np.stack([np.array(image) for image in data])
         self.targets = np.array(targets)
@@ -40,7 +40,7 @@ class MYESC50():
         return len(self.targets)
 
 
-def my_esc50(name, transform=None):
+def my_esc10(name, transform=None):
     """
     Preprocesses the ESC10 dataset.
     """
@@ -56,7 +56,7 @@ def my_esc50(name, transform=None):
         target_data = h5target[name][:]
         h5target.close()
 
-        return MYESC50(image_data, target_data, transform)
+        return MYESC10(image_data, target_data, transform)
     else:
         file_path = f"E:\\Projects\\ContinuousLearning\\HCL_Audio\\assets\{name}\\"
 
@@ -80,6 +80,14 @@ def my_esc50(name, transform=None):
             data.append(S_img)
             targets.append(int(Path(filename).stem.split("-")[-1]))
 
+        uniqueTargets = list(set(targets))
+        uniqueTargets.sort()
+
+        for idx, val in enumerate(uniqueTargets):
+            for i, target in enumerate(targets):
+                if target == val:
+                    targets[i] = idx
+
         # Cache to file
         h5image = h5py.File(directory + "image_data.h5", "w")
         image_data = h5image.create_dataset(name, data=data)
@@ -88,21 +96,21 @@ def my_esc50(name, transform=None):
         target_data = h5target.create_dataset(name, data=targets)
         h5target.close()
 
-        return MYESC50(data, targets, transform)
+        return MYESC10(data, targets, transform)
 
 
-class ESC50(ContinualDataset):
+class ESC10(ContinualDataset):
     """
     Returns a structured ESC50 class
     """
 
-    NAME = "esc50"
+    NAME = "esc10"
     SETTING = "class-il"
-    N_CLASSES_PER_TASK = 5
-    N_TASKS = 10
+    N_CLASSES_PER_TASK = 2
+    N_TASKS = 5
 
     def __init__(self):
-        super(ESC50, self).__init__()
+        super(ESC10, self).__init__()
 
     def get_data_loaders(self):
         esc_norm = [[0.4914, 0.4822, 0.4465], [0.2470, 0.2435, 0.2615]]
@@ -111,8 +119,8 @@ class ESC50(ContinualDataset):
         test_transform = get_aug(train=False, train_classifier=False,
                                  mean_std=esc_norm, name="simsiam", image_size=32, cl_default=True)
 
-        train_dataset = my_esc50(self.NAME, transform=transform)
-        memory_dataset = my_esc50(self.NAME, transform=test_transform)
+        train_dataset = my_esc10(self.NAME, transform=transform)
+        memory_dataset = my_esc10(self.NAME, transform=test_transform)
 
         train_dataset, test_dataset = get_train_val(
             train_dataset, test_transform, self.NAME)
@@ -141,7 +149,7 @@ class ESC50(ContinualDataset):
         transform = transforms.Compose(
             [transforms.ToTensor(), transforms.Normalize(*esc_norm)])
 
-        train_dataset = my_esc50(self.NAME, train=True, transform=transform)
+        train_dataset = my_esc10(self.NAME, train=True, transform=transform)
         train_loader = get_previous_train_loader(
             train_dataset, batch_size, self)
 

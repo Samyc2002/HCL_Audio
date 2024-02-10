@@ -6,6 +6,7 @@ import copy
 import torch
 from pytorch_model_summary import summary
 
+from arguments import get_args
 from datasets import BACKBONES, get_dataset
 from models import get_model
 from utils.loggers import *
@@ -49,11 +50,11 @@ def evaluate(model, dataset, device, classifier=None, last=False):
     return accs, accs_mask_classes
 
 
-def main():
+def main(args):
     num_epochs = 2
 
-    dataset = get_dataset()
-    dataset_copy = get_dataset()
+    dataset = get_dataset(args)
+    dataset_copy = get_dataset(args)
 
     train_loader, test_loader, memory_loader = dataset_copy.get_data_loaders()
     # wandb.init(project="hcl_audio", sync_tensorboard=True)
@@ -70,12 +71,12 @@ def main():
     for t in range(dataset.N_TASKS):
         train_loader, memory_loader, test_loader = dataset.get_data_loaders()
 
-        global_progress = tqdm(range(0, num_epochs), desc=f'Training')
+        global_progress = tqdm(range(0, args.num_epochs), desc=f'Training')
 
         prev_mean_acc = 0.
         best_epoch = 0.
 
-        if BACKBONES["esc50"][t] != BACKBONES["esc50"][t-1]:
+        if BACKBONES[args.dataset][t] != BACKBONES[args.dataset][t-1]:
             model = get_model(dataset_copy, dataset.get_transform(),
                               task_id=t, global_model=global_model)
             print(summary(model.net.module.backbone, torch.zeros(
@@ -93,7 +94,7 @@ def main():
             model.train()
 
             local_progress = tqdm(
-                train_loader, desc=f'Epoch {epoch}/{num_epochs}', disable=True)
+                train_loader, desc=f'Epoch {epoch}/{args.num_epochs}', disable=True)
             for idx, data in enumerate(local_progress):
                 (images1, images2, notaug_images), labels = data
                 data_dict = model.observe(
@@ -122,7 +123,8 @@ def main():
         print(
             f"Updated global model at epoch {best_epoch} with accuracy {prev_mean_acc}")
 
-        model_path = os.path.join(".\checkpoints", f"distl_esc50_{t}.pth")
+        model_path = os.path.join(
+            ".\checkpoints", f"distl_{args.dataset}_{t}.pth")
         torch.save({
             'epoch': best_epoch+1,
             'state_dict': model.global_model.net.state_dict(),
@@ -136,4 +138,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = get_args()
+    main(args)

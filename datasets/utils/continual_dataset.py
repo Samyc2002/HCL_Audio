@@ -114,11 +114,11 @@ def store_masked_loaders(train_dataset, test_dataset, memory_dataset, setting):
     memory_dataset.targets = np.array(memory_dataset.targets)[train_mask]
 
     train_loader = DataLoader(
-        train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, pin_memory=True)
+        train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE,
-                             shuffle=False, num_workers=4, pin_memory=True)
+                             shuffle=False, num_workers=4, pin_memory=True, drop_last=True)
     memory_loader = DataLoader(
-        memory_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+        memory_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4, drop_last=True)
 
     setting.test_loaders.append(test_loader)
     setting.train_loaders.append(train_loader)

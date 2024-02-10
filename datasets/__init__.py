@@ -1,15 +1,21 @@
 # Dataset utils
+from .my_esc10 import ESC10
 from .my_esc50 import ESC50
+from .my_fsc import FSC
 
 NAMES = {
-    ESC50.NAME: ESC50
+    ESC10.NAME: ESC10,
+    ESC50.NAME: ESC50,
+    FSC.NAME: FSC
 }
-N_CLASSES = {'esc50': 10}
+N_CLASSES = {'esc10': 5, 'esc50': 10, "fsc": 9}
 BACKBONES = {
-    'esc50': ["resnet18"] * 4 + ["resnet34"] * 2 + ["vgg16.tv_in1k"] * 2 + ["mixer_b16_224.miil_in21k_ft_in1k"] * 2
+    'esc10': ["resnet18"] * 2 + ["resnet34"] * 1 + ["vgg16.tv_in1k"] * 1 + ["mixer_b16_224.miil_in21k_ft_in1k"] * 1,
+    'esc50': ["resnet18"] * 4 + ["resnet34"] * 2 + ["vgg16.tv_in1k"] * 2 + ["mixer_b16_224.miil_in21k_ft_in1k"] * 2,
+    "fsc": ["resnet18"] * 3 + ["resnet34"] * 2 + ["vgg16.tv_in1k"] * 2 + ["mixer_b16_224.miil_in21k_ft_in1k"] * 2,
 }
 
 
-def get_dataset():
+def get_dataset(args):
     # Generate the Dataset
-    return NAMES["esc50"]()
+    return NAMES[args.dataset]()

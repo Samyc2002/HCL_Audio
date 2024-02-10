@@ -1,4 +1,4 @@
-# My ESC50 dataset
+# My FSC dataset
 from utils import create_if_not_exists
 import numpy as np
 import h5py
@@ -13,7 +13,7 @@ import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
-class MYESC50():
+class MYFSC():
     def __init__(self, data, targets, transform):
         self.data = np.stack([np.array(image) for image in data])
         self.targets = np.array(targets)
@@ -40,9 +40,9 @@ class MYESC50():
         return len(self.targets)
 
 
-def my_esc50(name, transform=None):
+def my_fsc(name, transform=None):
     """
-    Preprocesses the ESC10 dataset.
+    Preprocesses the FSC dataset.
     """
     directory = f'data/{name}/'
     create_if_not_exists(directory)
@@ -55,8 +55,9 @@ def my_esc50(name, transform=None):
         h5target = h5py.File(directory + "target_data.h5", "r")
         target_data = h5target[name][:]
         h5target.close()
+        # print(image_data.shape)
 
-        return MYESC50(image_data, target_data, transform)
+        return MYFSC(image_data, target_data, transform)
     else:
         file_path = f"E:\\Projects\\ContinuousLearning\\HCL_Audio\\assets\{name}\\"
 
@@ -64,12 +65,18 @@ def my_esc50(name, transform=None):
         data, targets = [], []
 
         for filename in files:
-            y, sr = librosa.load(file_path + filename, sr=None)
+            y, sr = librosa.load(file_path + filename, sr=44100)
 
             S_dB = librosa.feature.melspectrogram(
-                y=y, sr=sr, n_mels=128, fmax=8000)
+                y=y, sr=sr, n_mels=32, fmax=12000, hop_length=512)
             S_dB = librosa.power_to_db(S_dB)
             # librosa.display.specshow(S_dB, sr=sr, x_axis='time', y_axis='mel')
+
+            # Ensure the shape is [n_mels, time_frames] without singleton dimensions
+            S_dB = np.squeeze(S_dB)
+
+            # Manually reshape the array to have more than one value per channel
+            # S_dB = np.repeat(S_dB[:, np.newaxis], 3, axis=-1)
 
             # Convert to PIL image
             S_dB -= S_dB.min()
@@ -78,7 +85,7 @@ def my_esc50(name, transform=None):
                 'RGB').resize((255, 255))
 
             data.append(S_img)
-            targets.append(int(Path(filename).stem.split("-")[-1]))
+            targets.append(int(Path(filename).stem.split("_")[0]) - 1)
 
         # Cache to file
         h5image = h5py.File(directory + "image_data.h5", "w")
@@ -88,21 +95,21 @@ def my_esc50(name, transform=None):
         target_data = h5target.create_dataset(name, data=targets)
         h5target.close()
 
-        return MYESC50(data, targets, transform)
+        return MYFSC(data, targets, transform)
 
 
-class ESC50(ContinualDataset):
+class FSC(ContinualDataset):
     """
     Returns a structured ESC50 class
     """
 
-    NAME = "esc50"
+    NAME = "fsc"
     SETTING = "class-il"
-    N_CLASSES_PER_TASK = 5
-    N_TASKS = 10
+    N_CLASSES_PER_TASK = 3
+    N_TASKS = 9
 
     def __init__(self):
-        super(ESC50, self).__init__()
+        super(FSC, self).__init__()
 
     def get_data_loaders(self):
         esc_norm = [[0.4914, 0.4822, 0.4465], [0.2470, 0.2435, 0.2615]]
@@ -111,8 +118,8 @@ class ESC50(ContinualDataset):
         test_transform = get_aug(train=False, train_classifier=False,
                                  mean_std=esc_norm, name="simsiam", image_size=32, cl_default=True)
 
-        train_dataset = my_esc50(self.NAME, transform=transform)
-        memory_dataset = my_esc50(self.NAME, transform=test_transform)
+        train_dataset = my_fsc(self.NAME, transform=transform)
+        memory_dataset = my_fsc(self.NAME, transform=test_transform)
 
         train_dataset, test_dataset = get_train_val(
             train_dataset, test_transform, self.NAME)
@@ -141,7 +148,7 @@ class ESC50(ContinualDataset):
         transform = transforms.Compose(
             [transforms.ToTensor(), transforms.Normalize(*esc_norm)])
 
-        train_dataset = my_esc50(self.NAME, train=True, transform=transform)
+        train_dataset = my_fsc(self.NAME, train=True, transform=transform)
         train_loader = get_previous_train_loader(
             train_dataset, batch_size, self)
 
