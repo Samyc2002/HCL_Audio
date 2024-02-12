@@ -61,8 +61,8 @@ def main(args):
     # wandb.run.name = f"{args.model.cl_model}_{args.dataset.name}_n_alpha_{args.alpha}"
 
     global_model = get_model(
-        dataset_copy, dataset.get_transform(), global_model=None)
-    model = get_model(dataset_copy, dataset.get_transform(),
+        dataset_copy, dataset.get_transform(), args, global_model=None)
+    model = get_model(dataset_copy, dataset.get_transform(), args,
                       global_model=global_model)
 
     accuracy = 0
@@ -77,7 +77,7 @@ def main(args):
         best_epoch = 0.
 
         if BACKBONES[args.dataset][t] != BACKBONES[args.dataset][t-1]:
-            model = get_model(dataset_copy, dataset.get_transform(),
+            model = get_model(dataset_copy, dataset.get_transform(), args,
                               task_id=t, global_model=global_model)
             print(summary(model.net.module.backbone, torch.zeros(
                 (1, 3, 32, 32)).to("cuda:0"), show_input=True))
@@ -124,14 +124,19 @@ def main(args):
             f"Updated global model at epoch {best_epoch} with accuracy {prev_mean_acc}")
 
         model_path = os.path.join(
-            ".\checkpoints", f"distl_{args.dataset}_{t}.pth")
+            "./checkpoints", f"distl_{args.dataset}_{t}.pth")
         torch.save({
             'epoch': best_epoch+1,
             'state_dict': model.global_model.net.state_dict(),
         }, model_path)
         print(f"Task Model saved to {model_path}")
-        with open(os.path.join(".\logs", f"checkpoint_path.txt"), 'w+') as f:
-            f.write(f'{model_path}')
+        with open(os.path.join("./logs", f"{args.dataset}/checkpoint_path.txt"), 'a') as f:
+            f.write(f'../.{model_path}')
+            f.write("\n")
+        with open(os.path.join("./logs", f"{args.dataset}/benchmarking.txt"), "a") as f:
+            mean_acc_class_il, mean_acc_task_il = mean_acc
+            f.write('Accuracy for {} task(s): \t [Class-IL]: {} % \t [Task-IL]: {} %\n'.format(
+                t+1, round(mean_acc_class_il, 2), round(mean_acc_task_il, 2)))
 
         if hasattr(model, "end_task"):
             model.end_task(dataset)
