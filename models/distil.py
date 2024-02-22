@@ -1,7 +1,7 @@
 # Distil Model
 from .utils.continual_model import ContinualModel
 from utils.buffer import Buffer
-from utils.losses import KL_div_Loss
+from utils.losses import KL_div_Loss, KL_div_Loss_New
 import torch
 import os
 
@@ -10,13 +10,16 @@ class Distil(ContinualModel):
     NAME = "distil"
     COMPATIBILITY = ["class-il", "domain-il", "task-il", "general-continual"]
 
-    def __init__(self, backbone, loss, len_train_loader, transform, global_model):
+    def __init__(self, backbone, loss, len_train_loader, transform, global_model, args):
         super(Distil, self).__init__(
             backbone, loss, len_train_loader, transform)
         self.global_model = global_model
         self.buffer = Buffer(200, self.device)
         self.global_model = global_model
-        self.criterion_kl = KL_div_Loss(temperature=1.0).cuda()
+        if args.new_loss:
+            self.criterion_kl = KL_div_Loss_New().cuda()
+        else:
+            self.criterion_kl = KL_div_Loss(temperature=1.0).cuda()
         self.soft = torch.nn.Softmax(dim=1)
 
     def observe(self, inputs1, labels, inputs2, notaug_inputs, task_id):

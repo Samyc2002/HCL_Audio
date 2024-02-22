@@ -2,7 +2,7 @@ from .simsiam_aug import SimSiamTransform
 from .eval_aug import Transform_single
 
 
-def get_aug(name='simsiam', image_size=224, train=True, train_classifier=None, mean_std=None, **aug_kwargs):
+def get_aug(name='simsiam', image_size=255, train=True, train_classifier=None, mean_std=None, **aug_kwargs):
     if train == True:
         augmentation = SimSiamTransform(
             image_size, mean_std=mean_std, **aug_kwargs)

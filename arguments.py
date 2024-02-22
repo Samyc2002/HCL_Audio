@@ -44,12 +44,49 @@ def set_deterministic(seed):
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dataset',
-                        required=False, type=str, default="esc10")
-    parser.add_argument('-n', '--num_epochs',
-                        required=False, type=int, default=2)
-    parser.add_argument('-b', '--batch_size',
-                        required=False, type=int, default=2)
+    parser.add_argument(
+        '-d',
+        '--dataset',
+        required=False,
+        type=str,
+        default="esc10",
+        help="Define the dataset to be used for training (default=esc10, valid=[esc10, esc50, dcase19, fsc])"
+    )
+
+    parser.add_argument(
+        '-n',
+        '--num_epochs',
+        required=False,
+        type=int,
+        default=1,
+        help="Define the number of epochs to train the model for (default=1, valid=int)"
+    )
+
+    parser.add_argument(
+        '-b',
+        '--batch_size',
+        required=False,
+        type=int,
+        default=2,
+        help="Define the batch size for training (defaultt=2, valid=int)"
+    )
+
+    parser.add_argument(
+        '-nl',
+        '--new-loss',
+        required=False,
+        type=bool,
+        default=True,
+        help="Let us know if you want to use the new loss function (default=True, valid=[True, False])"
+    )
+
+    parser.add_argument(
+        '--device',
+        type=str,
+        default='cuda:0' if torch.cuda.is_available() else 'cpu',
+        help="Define the device to train the model in (default=cuda if available, else cpu, valid=[cpy, cuda])"
+    )
+
     # parser.add_argument('--debug', action='store_true')
     # parser.add_argument('--debug_subset_size', type=int, default=8)
     # parser.add_argument('--download', action='store_true',
@@ -60,8 +97,6 @@ def get_args():
     #                     default=os.getenv('CHECKPOINT'))
     # parser.add_argument('--ckpt_dir_1', type=str,
     #                     default=os.getenv('CHECKPOINT'))
-    # parser.add_argument('--device', type=str,
-    #                     default='cuda' if torch.cuda.is_available() else 'cpu')
     # parser.add_argument('--eval_from', type=str, default=None)
     # parser.add_argument('--hide_progress', action='store_true')
     # parser.add_argument('--cl_default', action='store_true')

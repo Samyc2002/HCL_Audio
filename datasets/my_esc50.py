@@ -40,11 +40,11 @@ class MYESC50():
         return len(self.targets)
 
 
-def my_esc50(name, transform=None):
+def my_esc50(name, transform=None, image_size=255):
     """
     Preprocesses the ESC10 dataset.
     """
-    directory = f'data/{name}/'
+    directory = f'data/{name}/{image_size}/'
     create_if_not_exists(directory)
 
     if os.path.exists(directory + "image_data.h5") and os.path.exists(directory + "target_data.h5"):
@@ -75,7 +75,7 @@ def my_esc50(name, transform=None):
             S_dB -= S_dB.min()
             S_dB *= (255.0 / S_dB.max())
             S_img = Image.fromarray(S_dB.astype(np.uint8)).convert(
-                'RGB').resize((255, 255))
+                'RGB').resize((image_size, image_size))
 
             data.append(S_img)
             targets.append(int(Path(filename).stem.split("-")[-1]))
@@ -104,23 +104,28 @@ class ESC50(ContinualDataset):
     def __init__(self):
         super(ESC50, self).__init__()
 
-    def get_data_loaders(self):
+    def get_data_loaders(self, args, task_id):
         esc_norm = [[0.4914, 0.4822, 0.4465], [0.2470, 0.2435, 0.2615]]
+        image_size = 255
+        if task_id >= 6:
+            image_size = 224
         transform = get_aug(train=True, mean_std=esc_norm,
-                            name="simsiam", image_size=32, cl_default=True)
+                            name="simsiam", image_size=image_size, cl_default=True)
         test_transform = get_aug(train=False, train_classifier=False,
-                                 mean_std=esc_norm, name="simsiam", image_size=32, cl_default=True)
+                                 mean_std=esc_norm, name="simsiam", image_size=image_size, cl_default=True)
 
-        train_dataset = my_esc50(self.NAME, transform=transform)
-        memory_dataset = my_esc50(self.NAME, transform=test_transform)
+        train_dataset = my_esc50(
+            self.NAME, transform=transform, image_size=image_size)
+        memory_dataset = my_esc50(
+            self.NAME, transform=test_transform, image_size=image_size)
 
         train_dataset, test_dataset = get_train_val(
-            train_dataset, test_transform, self.NAME)
+            train_dataset, test_transform, self.NAME, image_size=image_size)
         memory_dataset, _ = get_train_val(
-            memory_dataset, test_transform, self.NAME)
+            memory_dataset, test_transform, self.NAME, image_size=image_size)
 
         train, memory, test = store_masked_loaders(
-            train_dataset, test_dataset, memory_dataset, self)
+            train_dataset, test_dataset, memory_dataset, self, image_size=image_size)
         return train, memory, test
 
     def get_transform(self):
@@ -136,12 +141,16 @@ class ESC50(ContinualDataset):
 
         return transform
 
-    def not_aug_dataloader(self, batch_size):
+    def not_aug_dataloader(self, batch_size, task_id):
         esc_norm = [[0.4914, 0.4822, 0.4465], [0.2470, 0.2435, 0.2615]]
+        image_size = 255
+        if task_id >= 6:
+            image_size = 224
         transform = transforms.Compose(
             [transforms.ToTensor(), transforms.Normalize(*esc_norm)])
 
-        train_dataset = my_esc50(self.NAME, train=True, transform=transform)
+        train_dataset = my_esc50(
+            self.NAME, train=True, transform=transform, image_size=image_size)
         train_loader = get_previous_train_loader(
             train_dataset, batch_size, self)
 

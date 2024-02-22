@@ -33,7 +33,7 @@ class LabelSmoothing(nn.Module):
 class KL_div_Loss(nn.Module):
     """
     We use formulation of Hinton et. for KD loss.
-    $T^2$ scaling is implemented to avoid gradient rescaling when using T!=1
+    $T^2$ scaling was implemented to avoid gradient rescaling when using T!=1
     """
 
     def __init__(self, temperature):
@@ -47,10 +47,35 @@ class KL_div_Loss(nn.Module):
         print("Setting temperature = {} for KD".format(self.temperature))
 
     def forward(self, y, teacher_scores):
-        p = F.log_softmax(y / self.temperature, dim=1)  # Hinton formulation
-
-        # p = F.log_softmax(y, dim=1) # Muller et. al used this.
+        # Hinton formulation
+        p = F.log_softmax(y/self.temperature, dim=1)
 
         q = F.softmax(teacher_scores / self.temperature, dim=1)
         l_kl = F.kl_div(p, q, reduction='batchmean')
-        return l_kl*(self.temperature**2)  # $T^2$ scaling is important
+        return l_kl * (self.temperature)**2
+
+
+# Define new KL divergence loss
+class KL_div_Loss_New(nn.Module):
+    """
+    We use formulation of Hinton et. for KD loss.
+    $T^2$ scaling was implemented to avoid gradient rescaling when using T!=1
+    """
+
+    def __init__(self):
+        """
+        Constructor for the LabelSmoothing module.
+        :param smoothing: label smoothing factor
+        """
+        super(KL_div_Loss_New, self).__init__()
+
+    def forward(self, y, teacher_scores):
+        # Hinton formulation
+        p = F.log_softmax(
+            F.normalize(torch.matmul(y, torch.transpose(y, 0, 1))), dim=1)
+
+        q = F.softmax(F.normalize(torch.matmul(teacher_scores,
+                      torch.transpose(teacher_scores, 0, 1))), dim=1)
+        l_kl = F.kl_div(p, q, reduction='batchmean')
+
+        return l_kl

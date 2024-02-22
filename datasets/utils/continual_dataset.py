@@ -26,7 +26,10 @@ class ContinualDataset:
         :param args: the arguments which contains the hyperparameters
         """
         self.train_loader = None
-        self.test_loaders = []
+        self.test_loaders = {
+            224: [],
+            255: []
+        }
         self.memory_loaders = []
         self.train_loaders = []
         self.i = 0
@@ -91,7 +94,7 @@ class ContinualDataset:
         pass
 
 
-def store_masked_loaders(train_dataset, test_dataset, memory_dataset, setting):
+def store_masked_loaders(train_dataset, test_dataset, memory_dataset, setting, image_size=255):
     """
     Divides the dataset into tasks.
     :param train_dataset: train dataset
@@ -120,7 +123,7 @@ def store_masked_loaders(train_dataset, test_dataset, memory_dataset, setting):
     memory_loader = DataLoader(
         memory_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4, drop_last=True)
 
-    setting.test_loaders.append(test_loader)
+    setting.test_loaders[image_size].append(test_loader)
     setting.train_loaders.append(train_loader)
     setting.memory_loaders.append(memory_loader)
     setting.train_loader = train_loader

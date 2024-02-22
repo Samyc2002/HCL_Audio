@@ -10,12 +10,51 @@ NAMES = {
     DCASE19.NAME: DCASE19,
     FSC.NAME: FSC
 }
-N_CLASSES = {'esc10': 5, 'esc50': 10, "dcase19": 3, "fsc": 9}
+
+
+N_CLASSES = {
+    'esc10': 5,
+    'esc50': 10,
+    "dcase19": 3,
+    "fsc": 9
+}
+
 BACKBONES = {
-    'esc10': ["resnet18"] * 2 + ["resnet34"] * 1 + ["vgg16.tv_in1k"] * 1 + ["mixer_b16_224.miil_in21k_ft_in1k"] * 1,
-    'esc50': ["resnet18"] * 4 + ["resnet34"] * 2 + ["vgg16.tv_in1k"] * 2 + ["mixer_b16_224.miil_in21k_ft_in1k"] * 2,
-    "dcase19": ["resnet18", "vgg16.tv_in1k", "mixer_b16_224.miil_in21k_ft_in1k"],
-    "fsc": ["resnet18"] * 3 + ["resnet34"] * 2 + ["vgg16.tv_in1k"] * 2 + ["mixer_b16_224.miil_in21k_ft_in1k"] * 2,
+    'esc10': [
+        "resnet18",
+        "resnet34",
+        "vgg16.tv_in1k",
+        "mixer_b16_224.miil_in21k_ft_in1k",
+        "vit_base_patch16_224"
+    ],
+    'esc50': [
+        "resnet18",
+        "resnet18",
+        "resnet34",
+        "resnet34",
+        "vgg16.tv_in1k",
+        "vgg16.tv_in1k",
+        "mixer_b16_224.miil_in21k_ft_in1k",
+        "mixer_b16_224.miil_in21k_ft_in1k",
+        "vit_base_patch16_224",
+        "vit_base_patch16_224"
+    ],
+    "dcase19": [
+        "resnet18",
+        "vgg16.tv_in1k",
+        "mixer_b16_224.miil_in21k_ft_in1k"
+    ],
+    "fsc": [
+        "resnet18",
+        "resnet18",
+        "resnet34",
+        "resnet34",
+        "vgg16.tv_in1k",
+        "vgg16.tv_in1k",
+        "mixer_b16_224.miil_in21k_ft_in1k",
+        "mixer_b16_224.miil_in21k_ft_in1k",
+        "vit_base_patch16_224"
+    ],
 }
 
 

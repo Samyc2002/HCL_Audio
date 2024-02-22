@@ -8,23 +8,32 @@ from utils.losses import LabelSmoothing
 
 def get_backbone(args, task_id=0):
     # Get the model backbone
-    backbone = BACKBONES["fsc"][task_id]
+    backbone = BACKBONES[args.dataset][task_id]
 
     net = eval(
         f"timm.create_model('{backbone}', pretrained=True, num_classes=10)")
     print("Backbone changed to ", backbone)
 
     net.n_classes = N_CLASSES[args.dataset]
-    net.output_dim = net.fc.in_features
+    if backbone == "resnet18":
+        net.output_dim = net.fc.in_features
+    elif backbone == "resnet34":
+        net.output_dim = net.fc.in_features
+    elif backbone == "vgg16.tv_in1k":
+        net.output_dim = net.head.fc.in_features
+    elif backbone == "mixer_b16_224.miil_in21k_ft_in1k":
+        net.output_dim = net.head.in_features
+    elif backbone == "vit_base_patch16_224":
+        net.output_dim = net.head.in_features
 
     return net
 
 
-def get_model(dataset, transform, args, global_model=None, task_id=0):
+def get_model(device, dataset, transform, args, global_model=None, task_id=0):
     # Get the model
     loss = LabelSmoothing(smoothing=0.1)
 
-    backbone = SimSiam(get_backbone(args, task_id=task_id)).to("cuda:0")
+    backbone = SimSiam(get_backbone(args, task_id=task_id)).to(device)
     backbone.projector.set_layers(2)
 
-    return Distil(backbone, loss, dataset, transform, global_model)
+    return Distil(backbone, loss, dataset, transform, global_model, args)

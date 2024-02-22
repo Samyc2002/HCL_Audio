@@ -10,11 +10,12 @@ from utils import create_if_not_exists
 
 class ValidationDataset(torch.utils.data.Dataset):
     def __init__(self, data: torch.Tensor, targets: np.ndarray,
-                 transform: transforms = None, target_transform: transforms = None) -> None:
+                 transform: transforms = None, target_transform: transforms = None, image_size: int = 225) -> None:
         self.data = data
         self.targets = targets
         self.transform = transform
         self.target_transform = target_transform
+        self.image_size = image_size
 
     def __len__(self):
         return self.data.shape[0]
@@ -26,7 +27,7 @@ class ValidationDataset(torch.utils.data.Dataset):
         # to return a PIL Image
         if isinstance(img, np.ndarray):
             if np.max(img) < 2:
-                img = Image.fromarray(np.uint8(img * 255))
+                img = Image.fromarray(np.uint8(img * self.image_size))
             else:
                 img = Image.fromarray(img)
         else:
@@ -37,13 +38,14 @@ class ValidationDataset(torch.utils.data.Dataset):
 
         if self.target_transform is not None:
             target = self.target_transform(target)
+        print("from validation:", img.size())
 
         return img, target
 
 
-def get_train_val(train, test_transform, dataset, val_perc=0.1):
+def get_train_val(train, test_transform, dataset, image_size=255, val_perc=0.1):
     dataset_length = train.data.shape[0]
-    directory = 'datasets/val_permutations/'
+    directory = f'datasets/val_permutations/{image_size}/'
     create_if_not_exists(directory)
     file_name = dataset + '.pt'
     if os.path.exists(directory + file_name):
@@ -54,7 +56,7 @@ def get_train_val(train, test_transform, dataset, val_perc=0.1):
     train.data = train.data[perm]
     train.targets = np.array(train.targets)[perm]
     test_dataset = ValidationDataset(train.data[:int(
-        val_perc * dataset_length)], train.targets[:int(val_perc * dataset_length)], transform=test_transform)
+        val_perc * dataset_length)], train.targets[:int(val_perc * dataset_length)], transform=test_transform, image_size=image_size)
     train.data = train.data[int(val_perc * dataset_length):]
     train.targets = train.targets[int(val_perc * dataset_length):]
 

@@ -22,6 +22,14 @@ class Transform_single():
                 transforms.ToTensor(),
                 transforms.Normalize(*mean_std)
             ])
+            # self.transform = transforms.Compose([
+            #     transforms.RandomResizedCrop(image_size, scale=(0.08, 1.0), ratio=(
+            #         3.0/4.0, 4.0/3.0), interpolation=Image.BICUBIC),
+            #     # transforms.RandomCrop(image_size, padding=4),
+            #     transforms.RandomHorizontalFlip(),
+            #     transforms.ToTensor(),
+            #     transforms.Normalize(*mean_std)
+            # ])
 
     def __call__(self, x):
         return self.transform(x)
