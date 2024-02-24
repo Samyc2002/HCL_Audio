@@ -12,7 +12,7 @@ class ContinualModel(nn.Module):
     NAME = None
     COMPATIBILITY = []
 
-    def __init__(self, backbone, loss, dataset, transform):
+    def __init__(self, backbone, loss, dataset, transform, device):
         super(ContinualModel, self).__init__()
 
         self.net = backbone
@@ -24,8 +24,7 @@ class ContinualModel(nn.Module):
         self.opt = get_optimizer(
             "sgd", self.net, lr=0.0002, momentum=0.9, weight_decay=0.0005, cl_default=True)
 
-        self.device = torch.device(
-            "cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = device
 
     def forward(self, x):
         """

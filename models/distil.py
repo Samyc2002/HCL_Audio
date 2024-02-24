@@ -12,7 +12,7 @@ class Distil(ContinualModel):
 
     def __init__(self, backbone, loss, len_train_loader, transform, global_model, args):
         super(Distil, self).__init__(
-            backbone, loss, len_train_loader, transform)
+            backbone, loss, len_train_loader, transform, args.device)
         self.global_model = global_model
         self.buffer = Buffer(200, self.device)
         self.global_model = global_model
