@@ -73,7 +73,7 @@ def get_args():
 
     parser.add_argument(
         '-nl',
-        '--new-loss',
+        '--new_loss',
         required=False,
         type=bool,
         default=True,
@@ -109,6 +109,11 @@ def get_args():
     #                     help='Test on the OOD set')
     # parser.add_argument('--alpha', type=float, default=0.3)
     args = parser.parse_args()
+    print(f"Using dataset {args.dataset}")
+    print(f"Using number of epochs {args.num_epochs}")
+    print(f"Using batch size {args.batch_size}")
+    print(f"{'Not ' if not args.new_loss else ' '}Using New Loss Function")
+    print(f"Using device {args.device}\n")
 
     # with open(args.config_file, 'r') as f:
     #     for key, value in Namespace(yaml.load(f, Loader=yaml.FullLoader)).__dict__.items():
