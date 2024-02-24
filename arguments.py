@@ -112,7 +112,7 @@ def get_args():
     print(f"Using dataset {args.dataset}")
     print(f"Using number of epochs {args.num_epochs}")
     print(f"Using batch size {args.batch_size}")
-    print(f"{'Not ' if not args.new_loss else ' '}Using New Loss Function")
+    print(f"{'Not ' if not args.new_loss else ''}Using New Loss Function")
     print(f"Using device {args.device}\n")
 
     # with open(args.config_file, 'r') as f:
