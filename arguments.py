@@ -84,7 +84,14 @@ def get_args():
         '--device',
         type=str,
         default='cuda:0' if torch.cuda.is_available() else 'cpu',
-        help="Define the device to train the model in (default=cuda if available, else cpu, valid=[cpy, cuda])"
+        help="Define the device to train the model in (default=cuda if available, else cpu, valid=[cpy, cuda])")
+
+    parser.add_argument(
+        '--debug',
+        required=False,
+        type=bool,
+        default=False,
+        help="Show debug data. Shows values of arguments (default=False, valid=[True, False])"
     )
 
     # parser.add_argument('--debug', action='store_true')
@@ -109,11 +116,12 @@ def get_args():
     #                     help='Test on the OOD set')
     # parser.add_argument('--alpha', type=float, default=0.3)
     args = parser.parse_args()
-    print(f"Using dataset {args.dataset}")
-    print(f"Using number of epochs {args.num_epochs}")
-    print(f"Using batch size {args.batch_size}")
-    print(f"{'Not ' if not args.new_loss else ''}Using New Loss Function")
-    print(f"Using device {args.device}\n")
+    if args.debug:
+        print(f"Using dataset {args.dataset}")
+        print(f"Using number of epochs {args.num_epochs}")
+        print(f"Using batch size {args.batch_size}")
+        print(f"{'Not ' if not args.new_loss else ''}Using New Loss Function")
+        print(f"Using device {args.device}\n")
 
     # with open(args.config_file, 'r') as f:
     #     for key, value in Namespace(yaml.load(f, Loader=yaml.FullLoader)).__dict__.items():
