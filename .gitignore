@@ -5,3 +5,4 @@ data/
 logs/
 assets/
 wandb/
+**/val_permutations/

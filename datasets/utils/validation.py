@@ -38,7 +38,6 @@ class ValidationDataset(torch.utils.data.Dataset):
 
         if self.target_transform is not None:
             target = self.target_transform(target)
-        print("from validation:", img.size())
 
         return img, target
 
