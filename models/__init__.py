@@ -11,7 +11,7 @@ def get_backbone(args, task_id=0):
     backbone = BACKBONES[args.dataset][task_id]
 
     net = eval(
-        f"timm.create_model('{backbone}', pretrained=True, num_classes=10)")
+        f"timm.create_model('{backbone}', pretrained=True, num_classes={N_CLASSES[args.dataset]})")
     print("Backbone changed to ", backbone)
 
     net.n_classes = N_CLASSES[args.dataset]
