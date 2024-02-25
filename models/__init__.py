@@ -13,7 +13,7 @@ def get_backbone(args, task_id=0):
     NUM_CLASSES = {
         "esc10": 10,
         "esc50": 50,
-        "fsc10": 27,
+        "fsc": 27,
         "dcase19": 9
     }
 
