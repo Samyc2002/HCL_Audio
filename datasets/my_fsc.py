@@ -59,7 +59,7 @@ def my_fsc(name, transform=None, image_size=255):
 
         return MYFSC(image_data, target_data, transform)
     else:
-        file_path = f"E:\\Projects\\ContinuousLearning\\HCL_Audio\\assets\{name}\\"
+        file_path = f"assets/{name}/"
 
         files = os.listdir(file_path)
         data, targets = [], []

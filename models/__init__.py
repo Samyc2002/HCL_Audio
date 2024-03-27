@@ -17,8 +17,12 @@ def get_backbone(args, task_id=0):
         "dcase19": 9
     }
 
-    net = eval(
-        f"timm.create_model('{backbone}', pretrained=True, num_classes={NUM_CLASSES[args.dataset]})")
+    if args.download:
+        net = eval(
+            f"timm.create_model('{backbone}', pretrained=True, num_classes={NUM_CLASSES[args.dataset]})")
+    else:
+        net = eval(
+            f"timm.create_model('{backbone}', pretrained=True, num_classes={NUM_CLASSES[args.dataset]}, checkpoint_path='model-checkpoints/{backbone}')")
     print("Backbone changed to ", backbone)
 
     net.n_classes = N_CLASSES[args.dataset]

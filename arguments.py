@@ -94,6 +94,14 @@ def get_args():
         help="Show debug data. Shows values of arguments (default=False, valid=[True, False])"
     )
 
+    parser.add_argument(
+        '--download',
+        required=False,
+        type=bool,
+        default=True,
+        help="Download models from timm. If set to false, make sure that there is a model-checkpoints directory in root with the pretrained models as per the naming in the datasets/__init__.py file (default=True, valid=[True, False])"
+    )
+
     # parser.add_argument('--debug', action='store_true')
     # parser.add_argument('--debug_subset_size', type=int, default=8)
     # parser.add_argument('--download', action='store_true',

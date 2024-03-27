@@ -59,8 +59,8 @@ def my_dcase19(name, transform=None, image_size=255):
 
         return MYDCASE19(image_data, target_data, transform)
     else:
-        image_path = f"E:\\Projects\\ContinuousLearning\\HCL_Audio\\assets\{name}\\DCASE19.hdf5"
-        target_path = f"E:\\Projects\\ContinuousLearning\\HCL_Audio\\assets\{name}\\DCASE_Labels.csv"
+        image_path = f"assets/{name}/DCASE19.hdf5"
+        target_path = f"assets/{name}/DCASE_Labels.csv"
 
         data, targets = [], []
 

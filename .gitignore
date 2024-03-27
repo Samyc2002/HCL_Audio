@@ -1,6 +1,7 @@
 *.npy
 __pycache__/
 checkpoints/
+model-checkpoints/
 data/
 logs/
 assets/
