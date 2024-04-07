@@ -85,7 +85,6 @@ def main(device, args):
         model_path = os.path.join(
             "./checkpoints", f"distl_{args.dataset}_{t}.pth")
         save_dict = torch.load(model_path, map_location='cpu')
-        # mean_norm = [[0.4914, 0.4822, 0.4465], [0.2470, 0.2435, 0.2615]]
         model = get_model(
             device, dataset, dataset.get_transform(), args, task_id=t)
 
@@ -96,11 +95,6 @@ def main(device, args):
                 k[k.find(state_dict_substring) + len(state_dict_substring):].lstrip('.'): v for k, v in save_dict['state_dict'].items() if k[k.find(state_dict_substring) + len(state_dict_substring):].lstrip('.') in valid_keys
             },
             strict=True)
-        # msg = model.load_state_dict(
-        #     {
-        #         'net.' + k: v for k, v in save_dict['state_dict'].items() if k[k.find(state_dict_substring) + len(state_dict_substring):].lstrip('.') in valid_keys
-        #     },
-        #     strict=True)
         model = model.to(args.device)
 
         accs = evaluate(model.net.module.backbone,
