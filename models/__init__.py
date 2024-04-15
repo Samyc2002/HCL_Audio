@@ -14,7 +14,7 @@ def get_backbone(args, task_id=0):
         "esc10": 10,
         "esc50": 50,
         "fsc": 27,
-        "dcase19": 9
+        "dcase19": 10
     }
 
     if args.download:

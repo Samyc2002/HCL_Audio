@@ -94,8 +94,8 @@ class DCASE19(ContinualDataset):
 
     NAME = "dcase19"
     SETTING = "class-il"
-    N_CLASSES_PER_TASK = 3
-    N_TASKS = 3
+    N_CLASSES_PER_TASK = 5
+    N_TASKS = 2
 
     def __init__(self):
         super(DCASE19, self).__init__()
@@ -103,7 +103,7 @@ class DCASE19(ContinualDataset):
     def get_data_loaders(self, args, task_id):
         esc_norm = [[0.4914, 0.4822, 0.4465], [0.2470, 0.2435, 0.2615]]
         image_size = 255
-        if task_id >= 2:
+        if task_id >= 1:
             image_size = 224
         transform = get_aug(train=True, mean_std=esc_norm,
                             name="simsiam", image_size=image_size, cl_default=True)

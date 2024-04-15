@@ -15,7 +15,7 @@ NAMES = {
 N_CLASSES = {
     'esc10': 5,
     'esc50': 10,
-    "dcase19": 3,
+    "dcase19": 2,
     "fsc": 9
 }
 
@@ -41,7 +41,6 @@ BACKBONES = {
     ],
     "dcase19": [
         "resnet18",
-        "vgg16.tv_in1k",
         "mixer_b16_224.miil_in21k_ft_in1k"
     ],
     "fsc": [

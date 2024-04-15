@@ -3,6 +3,7 @@ __pycache__/
 checkpoints/
 model-checkpoints/
 data/
+customdatasets/
 logs/
 assets/
 wandb/

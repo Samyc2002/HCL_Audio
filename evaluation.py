@@ -79,8 +79,12 @@ def main(device, args):
             args, t)
         image_size = 255
         state_dict_substring = 'backbone.'
-        if t >= 2:
-            image_size = 224
+        if args.dataset == "dcase19":
+            if t >= 1:
+                image_size = 224
+        else:
+            if t >= 2:
+                image_size = 224
 
         model_path = os.path.join(
             "./checkpoints", f"distl_{args.dataset}_{t}.pth")
